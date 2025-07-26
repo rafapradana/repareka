@@ -42,8 +42,7 @@
   - Implementasi handling untuk akun yang belum diverifikasi
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. Buat homepage dengan service grid dan search functionality
-
+- [x] 6. Buat homepage dengan service grid dan search functionality
 
 
   - Implementasi ServiceGrid component dengan responsive card layout
