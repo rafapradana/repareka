@@ -223,6 +223,81 @@ const mockServices = [
       description: 'Layanan reparasi perangkat elektronik dan gadget',
       is_active: true
     }
+  },
+  // Tambahan data untuk testing filter yang lebih baik
+  {
+    id: 'f1234567-89ab-cdef-0123-456789abcdef',
+    mitra_id: '550e8400-e29b-41d4-a716-446655440004',
+    category_id: 'e998e954-63db-4755-983e-2c6b0c14633c',
+    title: 'Reparasi Meja Kayu',
+    description: 'Layanan reparasi furniture kayu, termasuk meja, kursi, dan lemari',
+    price_min: 80000,
+    price_max: 300000,
+    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300'],
+    rating: 4.3,
+    total_reviews: 95,
+    is_active: true,
+    created_at: '2025-07-26T05:06:50.147432Z',
+    updated_at: '2025-07-26T05:06:50.147432Z',
+    mitra: {
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      business_name: 'Furniture Jaya',
+      city: 'Bandung',
+      province: 'Jawa Barat',
+      email: 'furniture@jaya.com',
+      phone: '081234567893',
+      address: 'Jl. Asia Afrika No. 126',
+      business_type: 'small_business' as const,
+      verification_status: 'approved' as const,
+      is_active: true,
+      created_at: '2025-07-26T05:06:50.147432Z',
+      updated_at: '2025-07-26T05:06:50.147432Z'
+    },
+    category: {
+      id: 'e998e954-63db-4755-983e-2c6b0c14633c',
+      name: 'Furniture',
+      slug: 'furniture',
+      icon: '🪑',
+      description: 'Layanan reparasi furniture dan perabotan rumah',
+      is_active: true
+    }
+  },
+  {
+    id: 'a9876543-21ba-fedc-9876-543210fedcba',
+    mitra_id: '550e8400-e29b-41d4-a716-446655440005',
+    category_id: '368bdd0e-a6f2-449f-8efc-68b0e0107614',
+    title: 'Service Jam Tangan',
+    description: 'Layanan reparasi jam tangan mekanik dan digital, ganti baterai, service movement',
+    price_min: 25000,
+    price_max: 150000,
+    images: ['https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=300'],
+    rating: 4.7,
+    total_reviews: 234,
+    is_active: true,
+    created_at: '2025-07-26T05:06:50.147432Z',
+    updated_at: '2025-07-26T05:06:50.147432Z',
+    mitra: {
+      id: '550e8400-e29b-41d4-a716-446655440005',
+      business_name: 'Jam Service Pro',
+      city: 'Surabaya',
+      province: 'Jawa Timur',
+      email: 'jam@servicepro.com',
+      phone: '081234567894',
+      address: 'Jl. Tunjungan No. 127',
+      business_type: 'individual' as const,
+      verification_status: 'approved' as const,
+      is_active: true,
+      created_at: '2025-07-26T05:06:50.147432Z',
+      updated_at: '2025-07-26T05:06:50.147432Z'
+    },
+    category: {
+      id: '368bdd0e-a6f2-449f-8efc-68b0e0107614',
+      name: 'Jam/Aksesoris',
+      slug: 'jam-aksesoris',
+      icon: '⌚',
+      description: 'Layanan reparasi jam tangan dan aksesoris fashion',
+      is_active: true
+    }
   }
 ]
 
@@ -279,6 +354,31 @@ export async function GET(request: NextRequest) {
       filteredServices = filteredServices.filter(service => 
         service.price_max && service.price_max <= priceMax
       )
+    }
+
+    // Apply sorting
+    const sort = searchParams.get('sort') || ''
+    if (sort) {
+      switch (sort) {
+        case 'price_asc':
+          filteredServices.sort((a, b) => (a.price_min || 0) - (b.price_min || 0))
+          break
+        case 'price_desc':
+          filteredServices.sort((a, b) => (b.price_max || 0) - (a.price_max || 0))
+          break
+        case 'rating_desc':
+          filteredServices.sort((a, b) => b.rating - a.rating)
+          break
+        case 'newest':
+          filteredServices.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          break
+        default:
+          // Default: sort by rating desc (terpopuler)
+          filteredServices.sort((a, b) => b.rating - a.rating)
+      }
+    } else {
+      // Default sorting by rating
+      filteredServices.sort((a, b) => b.rating - a.rating)
     }
 
     // Pagination

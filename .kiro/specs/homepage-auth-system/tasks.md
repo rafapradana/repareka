@@ -44,7 +44,6 @@
 
 - [x] 6. Buat homepage dengan service grid dan search functionality
 
-
   - Implementasi ServiceGrid component dengan responsive card layout
   - Buat ServiceCard component dengan image, title, price(optional bagi mitra untuk mencantumkan harga langsung, dan bisa diberi keterangan untuk berkonsultasi terlebih dahulu), rating, dan location
   - Implementasi infinite scroll dengan intersection observer
@@ -52,8 +51,7 @@
   - Setup lazy loading untuk images dengan Next.js Image component
   - _Requirements: 1.3, 1.4, 1.5, 1.6, 2.1_
 
-- [ ] 7. Implementasi sistem filtering dan kategori
-
+- [x] 7. Implementasi sistem filtering dan kategori
   - Buat SearchAndFilter component dengan sidebar untuk desktop
   - Implementasi bottom sheet filter untuk mobile devices
   - Buat category navigation dengan icons dan responsive layout

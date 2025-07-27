@@ -98,20 +98,3 @@ function CategoryCard({ category, isSelected, onClick, mobile }: CategoryCardPro
   )
 }
 
-// CSS untuk hide scrollbar
-const scrollbarHideStyles = `
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-`
-
-// Inject styles
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style')
-  style.textContent = scrollbarHideStyles
-  document.head.appendChild(style)
-}

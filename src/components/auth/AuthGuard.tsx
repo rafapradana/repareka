@@ -105,3 +105,6 @@ export function MitraGuard({ children, ...props }: Omit<AuthGuardProps, 'require
     </AuthGuard>
   )
 }
+
+// Export MitraAuthGuard dari file terpisah
+export { MitraAuthGuard } from './MitraAuthGuard'
