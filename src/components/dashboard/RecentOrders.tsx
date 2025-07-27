@@ -145,16 +145,13 @@ function OrderItem({ order }: { order: Order }) {
             </Button>
           )}
           
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            asChild
+          <Link 
+            href={`/mitra/dashboard/orders/${order.id}`} 
+            title="Lihat detail"
+            className="h-8 w-8 p-0 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
           >
-            <Link href={`/mitra/dashboard/orders/${order.id}`} title="Lihat detail">
-              <Eye className="h-4 w-4" />
-            </Link>
-          </Button>
+            <Eye className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </div>
@@ -167,11 +164,12 @@ export function RecentOrders({ orders, loading }: RecentOrdersProps) {
       <div className="px-6 py-4 border-b border-base-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-base-900">Pesanan Terbaru</h3>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/mitra/dashboard/orders">
-              Lihat Semua
-            </Link>
-          </Button>
+          <Link 
+            href="/mitra/dashboard/orders"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+          >
+            Lihat Semua
+          </Link>
         </div>
       </div>
 
@@ -209,11 +207,12 @@ export function RecentOrders({ orders, loading }: RecentOrdersProps) {
               Pesanan dari pelanggan akan muncul di sini
             </p>
             <div className="mt-6">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/mitra/dashboard/services">
-                  Tambah Layanan
-                </Link>
-              </Button>
+              <Link 
+                href="/mitra/dashboard/services"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+              >
+                Tambah Layanan
+              </Link>
             </div>
           </div>
         )}

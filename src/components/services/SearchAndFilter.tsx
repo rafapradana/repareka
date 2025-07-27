@@ -47,7 +47,7 @@ export function SearchAndFilter({
   }, [debouncedSearch])
 
   // Handle filter changes
-  const handleFilterChange = useCallback((key: keyof FilterState, value: any) => {
+  const handleFilterChange = useCallback((key: keyof FilterState, value: FilterState[keyof FilterState]) => {
     const newFilters = { ...filters, [key]: value }
     
     // Reset city jika province berubah

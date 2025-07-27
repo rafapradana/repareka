@@ -12,4 +12,5 @@ export { useMitra } from '@/hooks/useMitra'
 export { AuthProvider, useAuthContext } from '@/contexts/AuthContext'
 
 // Export components
-export { AuthGuard, withAuthGuard, CustomerGuard, MitraGuard } from '@/components/auth/AuthGuard'
+export { AuthGuard } from '@/components/auth/AuthGuard'
+export { LoginPromptModal } from '@/components/auth/LoginPromptModal'

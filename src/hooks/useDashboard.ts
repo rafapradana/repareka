@@ -7,6 +7,8 @@ interface DashboardData {
   metrics: DashboardMetrics
   recentOrders: Order[]
   notifications: Notification[]
+  unreadNotificationsCount: number
+  unreadMessagesCount: number
 }
 
 interface UseDashboardReturn {
@@ -23,21 +25,66 @@ interface UseDashboardReturn {
  * Saat ini menggunakan mock data, nantinya akan diintegrasikan dengan API
  */
 // Mock data - akan diganti dengan API call
-const getMockData = (): DashboardData => ({
-  metrics: {
-    newOrders: 3,
-    totalRevenue: 2500000,
-    averageRating: 4.8,
-    completedOrders: 15,
-    pendingOrders: 5,
-    monthlyGrowth: 12.5
-  },
-  recentOrders: [
+const getMockData = (): DashboardData => {
+  const notifications = [
+    {
+      id: '1',
+      type: 'order' as const,
+      title: 'Pesanan Baru',
+      message: 'Ahmad Rizki memesan layanan Reparasi Sepatu Kulit',
+      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+      is_read: false,
+      action_url: '/mitra/dashboard/orders/1',
+      priority: 'high' as const
+    },
+    {
+      id: '2',
+      type: 'message' as const,
+      title: 'Pesan Baru',
+      message: 'Ahmad Rizki mengirim pesan tentang pesanannya',
+      created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
+      is_read: false,
+      action_url: '/mitra/dashboard/messages',
+      priority: 'medium' as const
+    },
+    {
+      id: '3',
+      type: 'review' as const,
+      title: 'Review Baru',
+      message: 'Budi Santoso memberikan review 5 bintang untuk layanan Anda',
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      is_read: true,
+      action_url: '/mitra/dashboard/reviews',
+      priority: 'low' as const
+    },
+    {
+      id: '4',
+      type: 'payment' as const,
+      title: 'Pembayaran Diterima',
+      message: 'Pembayaran untuk pesanan #12345 telah dikonfirmasi',
+      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+      is_read: true,
+      action_url: '/mitra/dashboard/orders/12345',
+      priority: 'medium' as const
+    },
+    {
+      id: '5',
+      type: 'system' as const,
+      title: 'Update Profil',
+      message: 'Jangan lupa lengkapi profil bisnis Anda untuk meningkatkan kepercayaan pelanggan',
+      created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+      is_read: false,
+      action_url: '/mitra/dashboard/profile',
+      priority: 'low' as const
+    }
+  ]
+
+  const recentOrders = [
     {
       id: '1',
       customer_name: 'Ahmad Rizki',
       service_title: 'Reparasi Sepatu Kulit',
-      status: 'pending',
+      status: 'pending' as const,
       total_amount: 150000,
       created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
       has_unread_messages: true
@@ -46,7 +93,7 @@ const getMockData = (): DashboardData => ({
       id: '2',
       customer_name: 'Siti Nurhaliza',
       service_title: 'Jahit Celana Panjang',
-      status: 'in_progress',
+      status: 'in_progress' as const,
       total_amount: 75000,
       created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
       has_unread_messages: false
@@ -55,65 +102,32 @@ const getMockData = (): DashboardData => ({
       id: '3',
       customer_name: 'Budi Santoso',
       service_title: 'Service Laptop',
-      status: 'completed',
+      status: 'completed' as const,
       total_amount: 300000,
       created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
       has_unread_messages: false
     }
-  ],
-  notifications: [
-    {
-      id: '1',
-      type: 'order',
-      title: 'Pesanan Baru',
-      message: 'Ahmad Rizki memesan layanan Reparasi Sepatu Kulit',
-      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-      is_read: false,
-      action_url: '/mitra/dashboard/orders/1',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      type: 'message',
-      title: 'Pesan Baru',
-      message: 'Ahmad Rizki mengirim pesan tentang pesanannya',
-      created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
-      is_read: false,
-      action_url: '/mitra/dashboard/messages',
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      type: 'review',
-      title: 'Review Baru',
-      message: 'Budi Santoso memberikan review 5 bintang untuk layanan Anda',
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      is_read: true,
-      action_url: '/mitra/dashboard/reviews',
-      priority: 'low'
-    },
-    {
-      id: '4',
-      type: 'payment',
-      title: 'Pembayaran Diterima',
-      message: 'Pembayaran untuk pesanan #12345 telah dikonfirmasi',
-      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-      is_read: true,
-      action_url: '/mitra/dashboard/orders/12345',
-      priority: 'medium'
-    },
-    {
-      id: '5',
-      type: 'system',
-      title: 'Update Profil',
-      message: 'Jangan lupa lengkapi profil bisnis Anda untuk meningkatkan kepercayaan pelanggan',
-      created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-      is_read: false,
-      action_url: '/mitra/dashboard/profile',
-      priority: 'low'
-    }
   ]
-})
+
+  // Hitung unread notifications dan messages
+  const unreadNotificationsCount = notifications.filter(n => !n.is_read).length
+  const unreadMessagesCount = recentOrders.filter(o => o.has_unread_messages).length
+
+  return {
+    metrics: {
+      newOrders: 3,
+      totalRevenue: 2500000,
+      averageRating: 4.8,
+      completedOrders: 15,
+      pendingOrders: 5,
+      monthlyGrowth: 12.5
+    },
+    recentOrders,
+    notifications,
+    unreadNotificationsCount,
+    unreadMessagesCount
+  }
+}
 
 export function useDashboard(): UseDashboardReturn {
   const [data, setData] = useState<DashboardData | null>(null)

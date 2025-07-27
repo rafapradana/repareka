@@ -145,16 +145,12 @@ function NotificationItem({
 
           {/* Action Button */}
           {notification.action_url && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="ml-2 h-8 px-2 text-xs"
-              asChild
+            <Link 
+              href={notification.action_url}
+              className="ml-2 h-8 px-2 text-xs inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
             >
-              <Link href={notification.action_url}>
-                Lihat
-              </Link>
-            </Button>
+              Lihat
+            </Link>
           )}
         </div>
       </div>
@@ -195,11 +191,12 @@ export function NotificationPanel({
                 Tandai Semua Dibaca
               </Button>
             )}
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/mitra/dashboard/notifications">
-                Lihat Semua
-              </Link>
-            </Button>
+            <Link 
+              href="/mitra/dashboard/notifications"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+            >
+              Lihat Semua
+            </Link>
           </div>
         </div>
       </div>

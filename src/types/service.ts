@@ -55,7 +55,9 @@ export interface FilterState {
 export interface ServiceGridProps {
   services: Service[]
   loading?: boolean
+  error?: Error | null
   onLoadMore: () => void
+  onRetry?: () => void
   hasMore: boolean
 }
 

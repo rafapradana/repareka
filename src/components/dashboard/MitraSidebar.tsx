@@ -13,8 +13,11 @@ import {
   BarChart3,
   MessageSquare,
   Star,
+  Bell,
+  ThumbsUp,
   LogOut
 } from 'lucide-react'
+import { useDashboard } from '@/hooks/useDashboard'
 import type { Mitra } from '@/lib/auth/types'
 
 interface MitraSidebarProps {
@@ -29,53 +32,68 @@ interface NavigationItem {
   badge?: number
 }
 
-const navigationItems: NavigationItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/mitra/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Pesanan',
-    href: '/mitra/dashboard/orders',
-    icon: ShoppingBag,
-    badge: 0, // Will be updated with real data
-  },
-  {
-    name: 'Layanan',
-    href: '/mitra/dashboard/services',
-    icon: Star,
-  },
-  {
-    name: 'Kalender',
-    href: '/mitra/dashboard/calendar',
-    icon: Calendar,
-  },
-  {
-    name: 'Pesan',
-    href: '/mitra/dashboard/messages',
-    icon: MessageSquare,
-    badge: 0, // Will be updated with real data
-  },
-  {
-    name: 'Laporan',
-    href: '/mitra/dashboard/reports',
-    icon: BarChart3,
-  },
-  {
-    name: 'Profil',
-    href: '/mitra/dashboard/profile',
-    icon: User,
-  },
-  {
-    name: 'Pengaturan',
-    href: '/mitra/dashboard/settings',
-    icon: Settings,
-  },
-]
-
 export function MitraSidebar({ mitra, onLogout }: MitraSidebarProps) {
   const pathname = usePathname()
+  const { data } = useDashboard()
+
+  // Update navigation items dengan badge count dinamis
+  const getNavigationItems = (): NavigationItem[] => [
+    {
+      name: 'Dashboard',
+      href: '/mitra/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      name: 'Pesanan',
+      href: '/mitra/dashboard/orders',
+      icon: ShoppingBag,
+      badge: data?.metrics.newOrders || 0,
+    },
+    {
+      name: 'Layanan',
+      href: '/mitra/dashboard/services',
+      icon: Star,
+    },
+    {
+      name: 'Kalender',
+      href: '/mitra/dashboard/calendar',
+      icon: Calendar,
+    },
+    {
+      name: 'Pesan',
+      href: '/mitra/dashboard/messages',
+      icon: MessageSquare,
+      badge: data?.unreadMessagesCount || 0,
+    },
+    {
+      name: 'Ulasan',
+      href: '/mitra/dashboard/reviews',
+      icon: ThumbsUp,
+    },
+    {
+      name: 'Laporan',
+      href: '/mitra/dashboard/reports',
+      icon: BarChart3,
+    },
+    {
+      name: 'Notifikasi',
+      href: '/mitra/dashboard/notifications',
+      icon: Bell,
+      badge: data?.unreadNotificationsCount || 0,
+    },
+    {
+      name: 'Profil',
+      href: '/mitra/dashboard/profile',
+      icon: User,
+    },
+    {
+      name: 'Pengaturan',
+      href: '/mitra/dashboard/settings',
+      icon: Settings,
+    },
+  ]
+
+  const navigationItems = getNavigationItems()
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-base-200">

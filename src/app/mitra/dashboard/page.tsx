@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { MitraAuthGuard } from '@/components/auth/MitraAuthGuard'
 import { 
   MitraDashboardLayout, 
   MetricsCards, 
@@ -28,11 +27,10 @@ export default function MitraDashboardPage() {
   }
 
   return (
-    <MitraAuthGuard>
-      <MitraDashboardLayout 
-        title="Dashboard" 
-        subtitle="Ringkasan aktivitas bisnis Anda"
-      >
+    <MitraDashboardLayout 
+      title="Dashboard" 
+      subtitle="Ringkasan aktivitas bisnis Anda"
+    >
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center justify-between">
@@ -69,12 +67,13 @@ export default function MitraDashboardPage() {
               </p>
             </div>
             <div className="mt-4 sm:mt-0 flex space-x-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/mitra/dashboard/services">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Tambah Layanan
-                </Link>
-              </Button>
+              <Link 
+                href="/mitra/dashboard/services"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Layanan
+              </Link>
               <Button
                 size="sm"
                 onClick={handleRefresh}
@@ -186,7 +185,6 @@ export default function MitraDashboardPage() {
             </div>
           </div>
         </div>
-      </MitraDashboardLayout>
-    </MitraAuthGuard>
+    </MitraDashboardLayout>
   )
 }

@@ -1,12 +1,14 @@
 'use client'
 
+import { Suspense } from 'react'
 import { MainLayout } from '@/components/layout'
 import { ServiceGrid, SearchAndFilter, CategoryNavigation, EmptyState } from '@/components/services'
 import { useServices } from '@/hooks/useServices'
 import { useUrlFilters } from '@/hooks/useUrlFilters'
 import { getLocationsForFilter } from '@/lib/utils/locations'
+import type { FilterState } from '@/types/service'
 
-export default function Home() {
+function HomeContent() {
   const {
     filters,
     updateFilters,
@@ -39,7 +41,7 @@ export default function Home() {
   }
 
   // Handle filter change
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: FilterState) => {
     updateFilters(newFilters)
   }
 
@@ -131,5 +133,19 @@ export default function Home() {
         </div>
       </div>
     </MainLayout>
+  )
+}
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <MainLayout>
+        <div className="container mx-auto px-4 py-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-base-600">Memuat...</p>
+        </div>
+      </MainLayout>
+    }>
+      <HomeContent />
+    </Suspense>
   )
 }

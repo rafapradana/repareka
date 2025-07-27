@@ -1,110 +1,78 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import type { UserRole } from '@/lib/auth/types'
+import { useRouter } from 'next/navigation'
+import { useEffect, ReactNode } from 'react'
 
 interface AuthGuardProps {
-  children: React.ReactNode
-  requiredRole?: UserRole
-  requireAuth?: boolean
+  children: ReactNode
+  requiredRole?: 'customer' | 'mitra'
+  fallback?: ReactNode
   redirectTo?: string
-  fallback?: React.ReactNode
 }
 
 /**
- * AuthGuard component untuk protecting routes dan components
- * Mengatur akses berdasarkan authentication status dan role
+ * AuthGuard component untuk melindungi route yang memerlukan autentikasi
+ * Akan redirect ke halaman login jika user belum authenticated
  */
-export function AuthGuard({
-  children,
-  requiredRole,
-  requireAuth = true,
-  redirectTo,
-  fallback
+export function AuthGuard({ 
+  children, 
+  requiredRole, 
+  fallback,
+  redirectTo 
 }: AuthGuardProps) {
   const { user, loading, isAuthenticated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Tunggu loading selesai
-    if (loading) return
-
-    // Jika memerlukan auth tapi user tidak authenticated
-    if (requireAuth && !isAuthenticated) {
-      const redirect = redirectTo || '/login'
-      router.push(redirect)
-      return
-    }
-
-    // Jika memerlukan role tertentu tapi user tidak memiliki role tersebut
-    if (requiredRole && user?.role !== requiredRole) {
-      // Redirect berdasarkan role user
-      if (user?.role === 'customer') {
-        router.push('/')
-      } else if (user?.role === 'mitra') {
-        router.push('/mitra/dashboard')
+    if (!loading && !isAuthenticated) {
+      // Simpan current URL untuk redirect setelah login
+      const currentUrl = window.location.pathname + window.location.search
+      const loginUrl = requiredRole === 'mitra' 
+        ? `/mitra?redirect=${encodeURIComponent(currentUrl)}`
+        : `/?login=true&redirect=${encodeURIComponent(currentUrl)}`
+      
+      if (redirectTo) {
+        router.push(redirectTo)
       } else {
-        router.push('/login')
+        router.push(loginUrl)
       }
-      return
     }
-  }, [loading, isAuthenticated, user, requiredRole, requireAuth, redirectTo, router])
+  }, [loading, isAuthenticated, router, requiredRole, redirectTo])
 
   // Tampilkan loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
       </div>
     )
   }
 
-  // Jika memerlukan auth tapi tidak authenticated
-  if (requireAuth && !isAuthenticated) {
-    return fallback || null
-  }
-
-  // Jika memerlukan role tertentu tapi tidak sesuai
-  if (requiredRole && user?.role !== requiredRole) {
-    return fallback || null
-  }
-
-  // Jika semua kondisi terpenuhi, render children
-  return <>{children}</>
-}
-
-// Higher-order component untuk wrapping pages
-export function withAuthGuard<P extends object>(
-  Component: React.ComponentType<P>,
-  options: Omit<AuthGuardProps, 'children'> = {}
-) {
-  return function AuthGuardedComponent(props: P) {
-    return (
-      <AuthGuard {...options}>
-        <Component {...props} />
-      </AuthGuard>
+  // Jika tidak authenticated, tampilkan fallback atau loading
+  if (!isAuthenticated) {
+    return fallback || (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+      </div>
     )
   }
-}
 
-// Specific guards untuk role-based protection
-export function CustomerGuard({ children, ...props }: Omit<AuthGuardProps, 'requiredRole'>) {
-  return (
-    <AuthGuard requiredRole="customer" {...props}>
-      {children}
-    </AuthGuard>
-  )
-}
+  // Check role jika diperlukan
+  if (requiredRole && user?.role !== requiredRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-base-800 mb-2">
+            Akses Ditolak
+          </h2>
+          <p className="text-base-600">
+            Anda tidak memiliki izin untuk mengakses halaman ini.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-export function MitraGuard({ children, ...props }: Omit<AuthGuardProps, 'requiredRole'>) {
-  return (
-    <AuthGuard requiredRole="mitra" {...props}>
-      {children}
-    </AuthGuard>
-  )
+  return <>{children}</>
 }
-
-// Export MitraAuthGuard dari file terpisah
-export { MitraAuthGuard } from './MitraAuthGuard'

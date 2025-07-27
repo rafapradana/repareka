@@ -72,7 +72,7 @@ export function useUrlFilters() {
   }, [filters, updateFilters])
 
   // Update single filter
-  const updateFilter = useCallback((key: keyof FilterState, value: any) => {
+  const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     const newFilters = { ...filters }
     
     if (value !== undefined && value !== null && value !== '') {
