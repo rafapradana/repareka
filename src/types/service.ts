@@ -49,12 +49,15 @@ export interface FilterState {
   price_max?: number
   rating?: number
   search?: string
+  sort?: string
 }
 
 export interface ServiceGridProps {
   services: Service[]
   loading?: boolean
+  error?: Error | null
   onLoadMore: () => void
+  onRetry?: () => void
   hasMore: boolean
 }
 

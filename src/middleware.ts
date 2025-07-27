@@ -78,7 +78,18 @@ export async function middleware(req: NextRequest) {
   
   // Routes yang memerlukan authentication
   const protectedRoutes = ['/dashboard', '/profile', '/orders', '/chat']
-  const mitraRoutes = ['/mitra/dashboard', '/mitra/orders', '/mitra/profile', '/mitra/calendar']
+  const mitraRoutes = [
+    '/mitra/dashboard', 
+    '/mitra/dashboard/orders', 
+    '/mitra/dashboard/services',
+    '/mitra/dashboard/calendar',
+    '/mitra/dashboard/messages',
+    '/mitra/dashboard/reviews',
+    '/mitra/dashboard/reports',
+    '/mitra/dashboard/notifications',
+    '/mitra/dashboard/profile',
+    '/mitra/dashboard/settings'
+  ]
   const customerRoutes = ['/customer/profile', '/customer/orders', '/customer/chat']
   
   // Cek apakah route memerlukan protection
@@ -90,11 +101,14 @@ export async function middleware(req: NextRequest) {
   if (!session && (isProtectedRoute || isMitraRoute || isCustomerRoute)) {
     // Untuk mitra routes, redirect ke /mitra (halaman auth mitra)
     if (isMitraRoute) {
-      return NextResponse.redirect(new URL('/mitra', req.url))
+      const redirectUrl = new URL('/mitra', req.url)
+      redirectUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(redirectUrl)
     }
-    // Untuk routes lain, redirect ke login umum
-    const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('redirectTo', pathname)
+    // Untuk routes lain, redirect ke homepage dengan login prompt
+    const redirectUrl = new URL('/', req.url)
+    redirectUrl.searchParams.set('login', 'true')
+    redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
   }
   

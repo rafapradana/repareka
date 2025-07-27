@@ -3,12 +3,17 @@
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff, Loader2, Mail, User, Lock, Phone, MapPin } from "lucide-react"
+import { Eye, EyeOff, Loader2, Mail, User, Lock, Phone, MapPin, AlertCircle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LocationSelect } from "@/components/ui/location-select"
+import { AuthFormSkeleton } from "@/components/ui/LoadingSkeleton"
 import { useAuth } from "@/lib/auth"
+import { useToast } from "@/components/ui/Toast"
+import { useRetry } from "@/hooks/useRetry"
+import { useNetworkStatus } from "@/hooks/useNetworkStatus"
+import { classifyError } from "@/lib/utils/errorHandler"
 import { 
   loginSchema, 
   customerRegisterSchema, 
@@ -36,9 +41,12 @@ export function CustomerAuthForm({
   className 
 }: CustomerAuthFormProps) {
   const { login, registerAsCustomer, loading } = useAuth()
+  const { addToast } = useToast()
+  const { isOnline } = useNetworkStatus()
   const [showPassword, setShowPassword] = React.useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
-  const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [submitError, setSubmitError] = React.useState<Error | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   // Form untuk login
   const loginForm = useForm<LoginFormData>({
@@ -77,36 +85,40 @@ export function CustomerAuthForm({
     return mode === 'login' ? loginForm.formState.errors : registerForm.formState.errors
   }
 
-  // Handle login submit
-  const handleLoginSubmit = async (data: LoginFormData) => {
-    try {
-      setSubmitError(null)
+  // Retry mechanism untuk login
+  const loginWithRetry = useRetry(
+    async (data: LoginFormData) => {
       await login(data)
-      onSuccess?.()
-    } catch (error) {
-      console.error('Login error:', error)
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Terjadi kesalahan saat login. Silakan coba lagi.'
-      setSubmitError(errorMessage)
-      onError?.(errorMessage)
+    },
+    {
+      maxAttempts: 3,
+      delay: 1000,
+      shouldRetry: (error, attempt) => {
+        const classified = classifyError(error)
+        return classified.isRetryable && attempt < 3
+      },
+      onRetry: (attempt, error) => {
+        const classified = classifyError(error)
+        if (classified.type === 'network') {
+          addToast({
+            type: 'warning',
+            title: 'Koneksi Bermasalah',
+            message: `Mencoba login lagi... (${attempt}/3)`
+          })
+        }
+      }
     }
-  }
+  )
 
-  // Handle register submit
-  const handleRegisterSubmit = async (data: CustomerRegisterFormData) => {
-    try {
-      setSubmitError(null)
-      
+  // Retry mechanism untuk register
+  const registerWithRetry = useRetry(
+    async (data: CustomerRegisterFormData) => {
       // Convert province and city IDs to names
       const province = getProvinceById(data.province)
       const city = getCityById(data.city)
       
       if (!province || !city) {
-        const errorMessage = 'Data lokasi tidak valid'
-        setSubmitError(errorMessage)
-        onError?.(errorMessage)
-        return
+        throw new Error('Data lokasi tidak valid')
       }
 
       await registerAsCustomer({
@@ -117,15 +129,112 @@ export function CustomerAuthForm({
         city: city.name,
         phone: data.phone || undefined,
       })
+    },
+    {
+      maxAttempts: 3,
+      delay: 1000,
+      shouldRetry: (error, attempt) => {
+        const classified = classifyError(error)
+        return classified.isRetryable && attempt < 3
+      },
+      onRetry: (attempt, error) => {
+        const classified = classifyError(error)
+        if (classified.type === 'network') {
+          addToast({
+            type: 'warning',
+            title: 'Koneksi Bermasalah',
+            message: `Mencoba registrasi lagi... (${attempt}/3)`
+          })
+        }
+      }
+    }
+  )
+
+  // Handle login submit
+  const handleLoginSubmit = async (data: LoginFormData) => {
+    if (!isOnline) {
+      const error = new Error('Tidak ada koneksi internet')
+      setSubmitError(error)
+      addToast({
+        type: 'error',
+        title: 'Tidak Ada Koneksi',
+        message: 'Periksa koneksi internet Anda dan coba lagi'
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      await loginWithRetry.execute(data)
+      
+      addToast({
+        type: 'success',
+        title: 'Login Berhasil',
+        message: 'Selamat datang kembali!'
+      })
       
       onSuccess?.()
     } catch (error) {
-      console.error('Register error:', error)
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Terjadi kesalahan saat registrasi. Silakan coba lagi.'
-      setSubmitError(errorMessage)
-      onError?.(errorMessage)
+      const err = error as Error
+      const classified = classifyError(err)
+      
+      setSubmitError(err)
+      
+      addToast({
+        type: 'error',
+        title: 'Login Gagal',
+        message: classified.message
+      })
+      
+      onError?.(classified.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Handle register submit
+  const handleRegisterSubmit = async (data: CustomerRegisterFormData) => {
+    if (!isOnline) {
+      const error = new Error('Tidak ada koneksi internet')
+      setSubmitError(error)
+      addToast({
+        type: 'error',
+        title: 'Tidak Ada Koneksi',
+        message: 'Periksa koneksi internet Anda dan coba lagi'
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      await registerWithRetry.execute(data)
+      
+      addToast({
+        type: 'success',
+        title: 'Registrasi Berhasil',
+        message: 'Silakan cek email Anda untuk verifikasi akun'
+      })
+      
+      onSuccess?.()
+    } catch (error) {
+      const err = error as Error
+      const classified = classifyError(err)
+      
+      setSubmitError(err)
+      
+      addToast({
+        type: 'error',
+        title: 'Registrasi Gagal',
+        message: classified.message
+      })
+      
+      onError?.(classified.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -321,10 +430,45 @@ export function CustomerAuthForm({
           </div>
         )}
 
+        {/* Network Status Warning */}
+        {!isOnline && (
+          <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <p className="text-sm text-orange-600">
+                Tidak ada koneksi internet. Periksa koneksi Anda.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Submit Error */}
         {submitError && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{submitError}</p>
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm text-red-600">
+                  {classifyError(submitError).message}
+                </p>
+                {classifyError(submitError).isRetryable && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (mode === 'login') {
+                        loginForm.handleSubmit(handleLoginSubmit)()
+                      } else {
+                        registerForm.handleSubmit(handleRegisterSubmit)()
+                      }
+                    }}
+                    className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                    disabled={isSubmitting || !isOnline}
+                  >
+                    Coba Lagi
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -332,13 +476,15 @@ export function CustomerAuthForm({
         <Button
           type="submit"
           className="w-full"
-          disabled={loading}
+          disabled={loading || isSubmitting || !isOnline}
         >
-          {loading ? (
+          {(loading || isSubmitting) ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {mode === 'login' ? 'Masuk...' : 'Mendaftar...'}
             </>
+          ) : !isOnline ? (
+            'Tidak Ada Koneksi'
           ) : (
             mode === 'login' ? 'Masuk' : 'Daftar'
           )}

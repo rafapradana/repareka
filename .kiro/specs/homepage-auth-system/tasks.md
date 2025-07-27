@@ -42,9 +42,7 @@
   - Implementasi handling untuk akun yang belum diverifikasi
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. Buat homepage dengan service grid dan search functionality
-
-
+- [x] 6. Buat homepage dengan service grid dan search functionality
 
   - Implementasi ServiceGrid component dengan responsive card layout
   - Buat ServiceCard component dengan image, title, price(optional bagi mitra untuk mencantumkan harga langsung, dan bisa diberi keterangan untuk berkonsultasi terlebih dahulu), rating, dan location
@@ -53,7 +51,7 @@
   - Setup lazy loading untuk images dengan Next.js Image component
   - _Requirements: 1.3, 1.4, 1.5, 1.6, 2.1_
 
-- [ ] 7. Implementasi sistem filtering dan kategori
+- [x] 7. Implementasi sistem filtering dan kategori
 
   - Buat SearchAndFilter component dengan sidebar untuk desktop
   - Implementasi bottom sheet filter untuk mobile devices
@@ -63,7 +61,7 @@
   - Buat empty state component untuk hasil pencarian kosong
   - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-- [ ] 8. Implementasi mitra dashboard dan routing
+- [x] 8. Implementasi mitra dashboard dan routing
 
   - Buat MitraDashboard component dengan sidebar navigation
   - Implementasi dashboard overview dengan metrics cards
@@ -72,7 +70,7 @@
   - Implementasi role-based access control untuk dashboard pages
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 9. Implementasi guest mode dan access restrictions
+- [x] 9. Implementasi guest mode dan access restrictions
 
   - Setup guest browsing functionality untuk homepage
   - Buat modal components untuk prompting login saat akses fitur terbatas
@@ -81,7 +79,7 @@
   - Buat AuthGuard component untuk protecting authenticated routes
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [ ] 10. Optimasi mobile responsiveness dan performance
+- [x] 10. Optimasi mobile responsiveness dan performance
 
   - Implementasi responsive design dengan Tailwind CSS breakpoints
   - Optimasi touch interactions dan gesture handling untuk mobile
@@ -90,7 +88,8 @@
   - Optimasi bundle size dengan tree shaking dan dynamic imports
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 11. Implementasi error handling dan loading states
+- [x] 11. Implementasi error handling dan loading states
+
 
   - Buat error boundary components untuk graceful error handling
   - Implementasi loading skeletons untuk service grid dan forms
@@ -100,6 +99,7 @@
   - _Requirements: 2.7, 3.7, 4.6_
 
 - [ ] 12. Testing dan quality assurance
+
   - Buat unit tests untuk authentication hooks dan utilities
   - Implementasi component tests untuk major UI components
   - Setup integration tests untuk authentication flows

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { X, Home, Grid3X3, Users, Info, LogIn, User as UserIcon, LogOut } from 'lucide-react'
+import { useGestures } from '@/hooks/useGestures'
+import { useMobile } from '@/hooks/useMobile'
 import type { User } from './types'
 
 interface MobileNavDrawerProps {
@@ -13,6 +15,17 @@ interface MobileNavDrawerProps {
 }
 
 export function MobileNavDrawer({ isOpen, onClose, user }: MobileNavDrawerProps) {
+  const { isMobile, isTouchDevice } = useMobile()
+  
+  // Gesture handling untuk swipe to close
+  const gestureHandlers = useGestures({
+    onSwipe: (swipe) => {
+      if (swipe.direction === 'left' && swipe.distance > 100) {
+        onClose()
+      }
+    }
+  })
+
   // Close drawer when clicking outside or pressing escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -24,13 +37,18 @@ export function MobileNavDrawer({ isOpen, onClose, user }: MobileNavDrawerProps)
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
+      
+      // Prevent scroll pada background saat drawer terbuka
+      document.documentElement.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
+      document.documentElement.style.overflow = 'unset'
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = 'unset'
+      document.documentElement.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
 
@@ -51,13 +69,16 @@ export function MobileNavDrawer({ isOpen, onClose, user }: MobileNavDrawerProps)
         onClick={onClose}
       />
       
-      {/* Drawer */}
-      <div className={`
-        fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-card border-r border-border z-50 
-        transform transition-transform duration-300 ease-in-out md:hidden
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex flex-col h-full">
+      {/* Drawer dengan gesture support */}
+      <div 
+        className={`
+          fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-card border-r border-border z-50 
+          transform transition-transform duration-300 ease-in-out md:hidden safe-area-top safe-area-bottom
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+        {...(isTouchDevice ? gestureHandlers : {})}
+      >
+        <div className="flex flex-col h-full mobile-viewport">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <Link href="/" className="flex items-center space-x-2" onClick={onClose}>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth, useUser, useMitra } from '@/lib/auth'
-import { AuthGuard, CustomerGuard, MitraGuard } from '@/lib/auth'
+import { AuthGuard } from '@/lib/auth'
 
 /**
  * Contoh penggunaan authentication system
@@ -71,7 +71,7 @@ export function CustomerProfileExample() {
   }
 
   return (
-    <CustomerGuard>
+    <AuthGuard requiredRole="customer">
       <div className="p-4 border rounded">
         <h2 className="text-xl font-bold">Customer Profile</h2>
         <p><strong>Name:</strong> {getFullName()}</p>
@@ -79,7 +79,7 @@ export function CustomerProfileExample() {
         <p><strong>Phone:</strong> {user?.phone || 'Not provided'}</p>
         <p><strong>Location:</strong> {getLocation()?.city}, {getLocation()?.province}</p>
       </div>
-    </CustomerGuard>
+    </AuthGuard>
   )
 }
 
@@ -118,7 +118,7 @@ export function MitraDashboardExample() {
   }
 
   return (
-    <MitraGuard>
+    <AuthGuard requiredRole="mitra">
       <div className="p-4 border rounded">
         <h2 className="text-xl font-bold">Mitra Dashboard</h2>
         <p><strong>Business Name:</strong> {getBusinessName()}</p>
@@ -128,7 +128,7 @@ export function MitraDashboardExample() {
         <p><strong>Location:</strong> {getLocation()?.city}, {getLocation()?.province}</p>
         <p><strong>Status:</strong> {isApproved ? 'Verified' : 'Pending'}</p>
       </div>
-    </MitraGuard>
+    </AuthGuard>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Header, Footer, MobileNavDrawer } from "./index";
+import { MobileOptimizedApp } from "@/components/mobile/MobileOptimizedApp";
 import type { User } from "./types";
 
 interface MainLayoutProps {
@@ -22,26 +23,30 @@ export function MainLayout({ children, user }: MainLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header dengan navigation */}
-      <Header
-        user={user}
-        onMobileMenuToggle={toggleMobileNav}
-        isMobileNavOpen={isMobileNavOpen}
-      />
+    <MobileOptimizedApp>
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header dengan navigation */}
+        <Header
+          user={user}
+          onMobileMenuToggle={toggleMobileNav}
+          isMobileNavOpen={isMobileNavOpen}
+        />
 
-      {/* Mobile Navigation Drawer */}
-      <MobileNavDrawer
-        isOpen={isMobileNavOpen}
-        onClose={closeMobileNav}
-        user={user}
-      />
+        {/* Mobile Navigation Drawer */}
+        <MobileNavDrawer
+          isOpen={isMobileNavOpen}
+          onClose={closeMobileNav}
+          user={user}
+        />
 
-      {/* Main Content */}
-      <main className="flex-1">{children}</main>
+        {/* Main Content */}
+        <main className="flex-1 safe-area-top safe-area-bottom">
+          {children}
+        </main>
 
-      {/* Footer */}
-      <Footer />
-    </div>
+        {/* Footer */}
+        <Footer />
+      </div>
+    </MobileOptimizedApp>
   );
 }
